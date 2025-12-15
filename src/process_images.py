@@ -45,7 +45,7 @@ def process_images():
             # Save
             filename = os.path.basename(file_path)
             output_path = os.path.join(PROCESSED_DIR, filename)
-            
+            # 
             cv2.imwrite(output_path, gray)
             processed_count += 1
             print(f"✅ Processed: {filename}")
