@@ -33,3 +33,33 @@ Separamos los datos en tres estados inmutables para evitar corrupción y fugas d
 2. Realiza tus experimentos en `notebooks/` o scripts en `src/`.
 3. Una vez tengas un modelo entrenado, expórtalo a `models/tflite/`.
 4. Copia el arreglo C generado a `deployment/arduino_project/` para compilarlo en Arduino IDE.
+
+## 🛠️ Scripts de Optimización (NUEVO)
+
+Se han añadido scripts avanzados para aplicar técnicas de compresión de modelos, esenciales para hardware limitado:
+
+### 1. `src/pruning_techniques.py` (Poda)
+Este script aplica diferentes estrategias para reducir conexiones neuronales no esenciales:
+- **Poda de Decaimiento Polinómico**: Aumenta gradualmente la dispersión durante el entrenamiento.
+- **Dispersión Constante**: Mantiene un nivel fijo de "ceros" en los pesos.
+- **Poda por Capas**: Aplica diferentes agresividades de poda según el tipo de capa (Conv2D vs Dense).
+
+**Uso:**
+```bash
+python3 src/pruning_techniques.py
+```
+
+### 2. `src/quantization_techniques.py` (Cuantización)
+Este script demuestra cómo reducir la precisión numérica de los pesos y activaciones para ahorrar memoria (Flash/RAM) y acelerar la inferencia:
+- **Rango Dinámico**: Pesos int8, activaciones float32.
+- **Enteros Completo (Float Fallback)**: Intenta int8, usa float si es necesario.
+- **Enteros Completo (Integer Only)**: Obligatorio para MCUs sencillos (Portenta, ESP32).
+- **Float16**: Reduce a la mitad el tamaño, útil para GPUs.
+- **QAT (Training Aware)**: Simula la cuantización durante el entrenamiento para recuperar precisión.
+
+**Uso:**
+```bash
+python3 src/quantization_techniques.py
+```
+> **Nota:** Requiere instalar `tensorflow-model-optimization`.
+

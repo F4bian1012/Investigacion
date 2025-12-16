@@ -67,4 +67,4 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    reshape_images(args.width, args.height)
+    reshape_images(args.width, args.height) 
