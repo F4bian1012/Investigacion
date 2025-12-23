@@ -63,3 +63,24 @@ python3 src/quantization_techniques.py
 ```
 > **Nota:** Requiere instalar `tensorflow-model-optimization`.
 
+## 📸 Captura y Visualización de Imágenes
+
+Herramientas para capturar y visualizar datos desde la cámara de la Portenta H7.
+
+### 1. Firmware Arduino (`deployment/arduino/image_capture/image_capture.ino`)
+Script para la Portenta H7 que captura imágenes en escala de grises (320x240) y las envía como bytes crudos a través del puerto serial.
+- **Configuración:** QVGA (320x240), Grayscale, 30 FPS (configuración inicial).
+- **Uso:** Cargar en la placa usando Arduino IDE.
+
+### 2. Visualizador Python (`src/visualize_serial_image.py`)
+Script para recibir y renderizar en tiempo real las imágenes enviadas por el Arduino.
+- **Detección automática de puerto:** Intenta encontrar el puerto serial de la Portenta si no se especifica.
+- **Renderizado:** Utiliza `matplotlib` para mostrar el stream de video.
+
+**Uso:**
+```bash
+python src/visualize_serial_image.py
+# O especificando el puerto manualmente:
+python src/visualize_serial_image.py --port /dev/tty.usbmodem1301 
+```
+
