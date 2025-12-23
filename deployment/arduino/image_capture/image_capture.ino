@@ -9,25 +9,18 @@ FrameBuffer fb;
 void setup() {
   Serial.begin(115200);
   while (!Serial);
-
-  // Initialize the camera
-  // QVGA = 320x240
-  // IMAGE_GRAYSCALE creates a grayscale image. Change to IMAGE_RGB565 for color.
-  if (!cam.begin(CAMERA_R320x240, IMAGE_MODE, 30)) {
+  if (!cam.begin(CAMERA_R160x120, IMAGE_MODE, 30)) {// Resoluciones disponibles CAMERA_R160x120     = 0,   /* QQVGA Resolution   */ CAMERA_R320x240     = 1,   /* QVGA Resolution    */ CAMERA_R320x320     = 2,   /* 320x320 Resolution */
     Serial.println("Failed to initialize camera!");
     while (1);
   }
-
-  Serial.println("Camera initialized.");
 }
 
 void loop() {
   
   if (cam.grabFrame(fb, 3000) == 0) {
-    // Get the frame buffer
-    Serial.write(fb.getBuffer());    
+    Serial.write(fb.getBuffer(),cam.frameSize());    
   } else {
     Serial.println("Failed to capture image.");
   }
-  delay(1000); // Wait for 2 seconds before next capture
+  delay(40);
 }
