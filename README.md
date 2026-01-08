@@ -31,8 +31,27 @@ Separamos los datos en tres estados inmutables para evitar corrupción y fugas d
    pip install -r requirements.txt
    ```
 2. Realiza tus experimentos en `notebooks/` o scripts en `src/`.
-3. Una vez tengas un modelo entrenado, expórtalo a `models/tflite/`.
 4. Copia el arreglo C generado a `deployment/arduino_project/` para compilarlo en Arduino IDE.
+
+## 🔄 Flujo de Trabajo Principal (MLOps)
+
+Scripts orquestadores para el ciclo de vida completo del modelo:
+
+### 1. Entrenamiento (`src/train_model.py`)
+Entrena el modelo base (CNN) con datos de Fashion MNIST normalizados.
+- **Entrada:** Dataset Fashion MNIST (descarga automática).
+- **Salida:** `models/checkpoints/best_model.keras`.
+- **Uso:** `python src/train_model.py`
+
+### 2. Optimización (`src/optimize_model.py`)
+Pipeline completo que aplica **Pruning** (poda) y **Cuantización Post-Entrenamiento** (PTQ) para generar modelos eficientes.
+- **Proceso:** Carga el modelo `.keras` -> Poda -> Fine-tuning -> Conversión a TFLite (Int8/Float).
+- **Salida:** Datos generados en `models/tflite/`.
+- **Uso:** `python src/optimize_model.py`
+
+### 3. Validación (`src/validate_model.py`)
+Compara la precisión del modelo original vs. el modelo cuantizado para asegurar calidad antes del despliegue.
+- **Uso:** `python src/validate_model.py`
 
 ## 🛠️ Scripts de Optimización (NUEVO)
 
@@ -68,8 +87,8 @@ python3 src/quantization_techniques.py
 Herramientas para capturar y visualizar datos desde la cámara de la Portenta H7.
 
 ### 1. Firmware Arduino (`deployment/arduino/image_capture/image_capture.ino`)
-Script para la Portenta H7 que captura imágenes en escala de grises (320x240) y las envía como bytes crudos a través del puerto serial.
-- **Configuración:** QVGA (320x240), Grayscale, 30 FPS (configuración inicial).
+Script para la Portenta H7 que captura imágenes en escala de grises (160x120) y las envía como bytes crudos a través del puerto serial.
+- **Configuración:** QQVGA (160x120), Grayscale, 30 FPS.
 - **Uso:** Cargar en la placa usando Arduino IDE.
 
 ### 2. Visualizador Python (`src/visualize_serial_image.py`)
@@ -83,4 +102,3 @@ python src/visualize_serial_image.py
 # O especificando el puerto manualmente:
 python src/visualize_serial_image.py --port /dev/tty.usbmodem1301 
 ```
-
