@@ -100,5 +100,8 @@ Script para recibir y renderizar en tiempo real las imágenes enviadas por el Ar
 ```bash
 python src/visualize_serial_image.py
 # O especificando el puerto manualmente:
+# En mac
 python src/visualize_serial_image.py --port /dev/tty.usbmodem1301 
+# En windows
+python src/visualize_serial_image.py --port COM7
 ```
