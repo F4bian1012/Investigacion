@@ -18,15 +18,17 @@ except ImportError:
 # ==========================================
 # CONFIGURATION & HYPERPARAMETERS
 # ==========================================
-IMG_WIDTH = 320
-IMG_HEIGHT = 320
 BATCH_SIZE = 32
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Test Model and Calculate Metrics")
-    parser.add_argument('--model_path', type=str, default="models/checkpoints/MobileNet+32+20+0.0001+0.2+320+320.keras", help="Ruta al modelo entrenado")
-    parser.add_argument('--data_dir', type=str, default="data/processed/320x320", help="Ruta al directorio con imágenes de prueba (debe contener subcarpetas por clase)")
+    parser.add_argument('--width', type=int, default=96, help="Image width")
+    parser.add_argument('--height', type=int, default=96, help="Image height")
+    parser.add_argument('--learning_rate', type=float, default=0.0001, help="Learning rate")
+    parser.add_argument('--model_path', type=str, default=f"models/checkpoints/MobileNet+32+20+{learning_rate}+0.2+{width}+{height}.keras", help="Ruta al modelo entrenado")
+    parser.add_argument('--data_dir', type=str, default=f"data/processed/{width}x{height}", help="Ruta al directorio con imágenes de prueba (debe contener subcarpetas por clase)")
     parser.add_argument('--class_names_path', type=str, default="models/class_names.txt", help="Ruta al archivo txt con los nombres de las clases")
+    
     return parser.parse_args()
 
 def main():
@@ -48,7 +50,7 @@ def main():
         print(f"Nombres de clases cargados: {class_names}")
 
     print(f"\nCargando el modelo desde {args.model_path}...")
-    model = keras.models.load_model(args.model_path)
+    model = keras.models.load_model(args.model_path, safe_mode=False)
 
     print(f"Cargando dataset de prueba desde {args.data_dir}...")
     # Usamos shuffle=False para mantener el orden de las imágenes y alinear y_true con y_pred
@@ -57,9 +59,9 @@ def main():
         labels='inferred',
         label_mode='int',
         class_names=class_names if class_names else None,
-        color_mode='rgb',
+        color_mode='grayscale',
         batch_size=BATCH_SIZE,
-        image_size=(IMG_HEIGHT, IMG_WIDTH),
+        image_size=(args.height, args.width),
         shuffle=False
     )
 
@@ -118,7 +120,11 @@ def main():
     out_dir = os.path.dirname(args.model_path)
     if not out_dir:
         out_dir = "."
-    cm_plot_path = os.path.join(out_dir, "Matrizmodelo2.png")
+        
+    model_basename = os.path.basename(args.model_path)
+    model_name_without_ext = os.path.splitext(model_basename)[0]
+    cm_plot_name = f"Matriz_{model_name_without_ext}.png"
+    cm_plot_path = os.path.join(out_dir, cm_plot_name)
     
     plt.savefig(cm_plot_path)
     print(f"Gráfico de la matriz de confusión guardado en {cm_plot_path}")

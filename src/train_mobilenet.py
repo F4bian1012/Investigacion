@@ -127,7 +127,7 @@ def create_mobilenet_model(num_classes, img_shape, learning_rate, base_model_nam
     x = data_augmentation(inputs)
     
     if img_shape[-1] == 1:
-        x = layers.Lambda(lambda t: tf.image.grayscale_to_rgb(t))(x)
+        x = layers.Concatenate(axis=-1)([x, x, x])
         
     x = preprocess_fn(x)
     x = base_model(x, training=False)
