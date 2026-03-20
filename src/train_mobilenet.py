@@ -42,6 +42,7 @@ def load_custom_data(data_dir, img_width, img_height, batch_size, validation_spl
             validation_split=validation_split,
             subset="training",
             seed=123,
+            color_mode='grayscale',
             image_size=(img_height, img_width),
             batch_size=batch_size
         )
@@ -51,6 +52,7 @@ def load_custom_data(data_dir, img_width, img_height, batch_size, validation_spl
             validation_split=validation_split,
             subset="validation",
             seed=123,
+            color_mode='grayscale',
             image_size=(img_height, img_width),
             batch_size=batch_size
         )
@@ -108,8 +110,13 @@ def create_mobilenet_model(num_classes, img_shape, learning_rate, base_model_nam
     else:
         raise ValueError(f"Modelo base no soportado: {base_model_name}")
 
+    base_input_shape = list(img_shape)
+    if base_input_shape[-1] == 1:
+        base_input_shape[-1] = 3
+    base_input_shape = tuple(base_input_shape)
+
     base_model = base_model_class(
-        input_shape=img_shape,
+        input_shape=base_input_shape,
         include_top=False,
         weights='imagenet',
         alpha=alpha
@@ -118,6 +125,10 @@ def create_mobilenet_model(num_classes, img_shape, learning_rate, base_model_nam
 
     inputs = tf.keras.Input(shape=img_shape)
     x = data_augmentation(inputs)
+    
+    if img_shape[-1] == 1:
+        x = layers.Lambda(lambda t: tf.image.grayscale_to_rgb(t))(x)
+        
     x = preprocess_fn(x)
     x = base_model(x, training=False)
     x = layers.GlobalAveragePooling2D()(x)
@@ -169,7 +180,7 @@ def plot_history(history, plot_path):
 
 def main(img_width, img_height, batch_size, epochs, learning_rate, validation_split, base_model_name):
     data_dir = f"data/processed/{img_width}x{img_height}"
-    img_shape = (img_width, img_height, 3)
+    img_shape = (img_width, img_height, 1)
     plot_path = f"tensorboard_logs/{base_model_name}_training_history+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{img_width}+{img_height}.png"
     checkpoint_path = f"models/checkpoints/{base_model_name}+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{img_width}+{img_height}.keras"
 

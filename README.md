@@ -74,44 +74,19 @@ python src/train_mobilenet.py --base_model "MobileNet"
 python src/train_mobilenet.py --base_model "MobileNetV3Large" --width 96 --height 96 --batch_size 16 --epochs 30 --learning_rate 0.00005 --validation_split 0.25
 ```
 
-### 2. Optimización (`src/optimize_model.py`)
-Pipeline completo que aplica **Pruning** (poda) y **Cuantización Post-Entrenamiento** (PTQ) para generar modelos eficientes.
-- **Proceso:** Carga el modelo `.keras` -> Poda -> Fine-tuning -> Conversión a TFLite (Int8/Float).
-- **Salida:** Datos generados en `models/tflite/`.
-- **Uso:** `python src/optimize_model.py`
-
-### 3. Validación (`src/validate_model.py`)
-Compara la precisión del modelo original vs. el modelo cuantizado para asegurar calidad antes del despliegue.
-- **Uso:** `python src/validate_model.py`
-
-## 🛠️ Scripts de Optimización (NUEVO)
-
-Se han añadido scripts avanzados para aplicar técnicas de compresión de modelos, esenciales para hardware limitado:
-
-### 1. `src/pruning_techniques.py` (Poda)
-Este script aplica diferentes estrategias para reducir conexiones neuronales no esenciales:
-- **Poda de Decaimiento Polinómico**: Aumenta gradualmente la dispersión durante el entrenamiento.
-- **Dispersión Constante**: Mantiene un nivel fijo de "ceros" en los pesos.
-- **Poda por Capas**: Aplica diferentes agresividades de poda según el tipo de capa (Conv2D vs Dense).
-
-**Uso:**
-```bash
-python3 src/pruning_techniques.py
-```
-
-### 2. `src/quantization_techniques.py` (Cuantización)
-Este script demuestra cómo reducir la precisión numérica de los pesos y activaciones para ahorrar memoria (Flash/RAM) y acelerar la inferencia:
-- **Rango Dinámico**: Pesos int8, activaciones float32.
-- **Enteros Completo (Float Fallback)**: Intenta int8, usa float si es necesario.
-- **Enteros Completo (Integer Only)**: Obligatorio para MCUs sencillos (Portenta, ESP32).
-- **Float16**: Reduce a la mitad el tamaño, útil para GPUs.
-- **QAT (Training Aware)**: Simula la cuantización durante el entrenamiento para recuperar precisión.
-
-**Uso:**
-```bash
-python3 src/quantization_techniques.py
-```
-> **Nota:** Requiere instalar `tensorflow-model-optimization`.
+### 2. Evaluación de Modelos (`src/test_model.py`)
+Script dedicado a calcular métricas estadísticas extensas (Accuracy, Precision, Recall, F1-Score) y visualizar el desempeño clase por clase generando una Matriz de Confusión.
+- **Entrada:** Dataset de prueba almacenado en `data/processed/{width}x{height}` y el modelo pre-entrenado guardado en `models/checkpoints/`.
+- **Salida:** En la terminal imprime métricas clase por clase; paralelamente guarda dinámicamente el heatmap grafico de la Matriz de Confusión al lado de tu modelo `.keras` evaluado (`Matrizmodelo_{modelo}.png`).
+- **Uso Estándar:**
+  ```bash
+  # El script por defecto tratará de localizar tu modelo usando los hiperparámetros pasados
+  python src/test_model.py --base_model "MobileNet" --epochs 20
+  ```
+- **Uso con ruta definida:**
+  ```bash
+  python src/test_model.py --model_path "models/checkpoints/MobileNet+32+20+0.0001+0.2+320+320.keras"
+  ```
 
 ## 📸 Captura y Visualización de Imágenes
 
