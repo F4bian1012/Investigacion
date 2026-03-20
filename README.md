@@ -76,17 +76,29 @@ python src/train_mobilenet.py --base_model "MobileNetV3Large" --width 96 --heigh
 
 ### 2. Evaluación de Modelos (`src/test_model.py`)
 Script dedicado a calcular métricas estadísticas extensas (Accuracy, Precision, Recall, F1-Score) y visualizar el desempeño clase por clase generando una Matriz de Confusión.
-- **Entrada:** Dataset de prueba almacenado en `data/processed/{width}x{height}` y el modelo pre-entrenado guardado en `models/checkpoints/`.
-- **Salida:** En la terminal imprime métricas clase por clase; paralelamente guarda dinámicamente el heatmap grafico de la Matriz de Confusión al lado de tu modelo `.keras` evaluado (`Matrizmodelo_{modelo}.png`).
-- **Uso Estándar:**
-  ```bash
-  # El script por defecto tratará de localizar tu modelo usando los hiperparámetros pasados
-  python src/test_model.py --base_model "MobileNet" --epochs 20
-  ```
-- **Uso con ruta definida:**
-  ```bash
-  python src/test_model.py --model_path "models/checkpoints/MobileNet+32+20+0.0001+0.2+320+320.keras"
-  ```
+
+- **Entrada Automática:** Si no se especifica explícitamente, el script infiere la ruta del modelo y del directorio de datos basándose en los parámetros de inferencia (`--width`, `--height`, `--learning_rate`).
+- **Salida:** Imprime métricas globales y por clase detalladas en la terminal. Paralelamente, guarda de forma dinámica el gráfico de la matriz de confusión usando el nombre de tu modelo evaluado (`Matriz_{nombre_del_modelo}.png`).
+
+**Hiperparámetros (Soportados por CLI):**
+- `--width` y `--height` (Por defecto: 96, definen resolución de carga de imágenes y carpetas)
+- `--learning_rate` (Por defecto: 0.0001)
+- `--model_path` (Opcional, ignora las rutas inferidas si se proporciona)
+- `--data_dir` (Opcional, por defecto resuelve a `data/processed/{width}x{height}`)
+
+**Uso Estándar (Deducción de rutas usando argumentos):**
+```bash
+# El script asume parámetros por defecto para buscar el modelo y el dataset
+python src/test_model.py
+
+# Modificando hiperparámetros (Inferirá modelo MobileNet+32+20+0.0005+0.2+160+160.keras)
+python src/test_model.py --width 160 --height 160 --learning_rate 0.0005
+```
+
+**Uso con ruta definida (Evita la deducción automática):**
+```bash
+python src/test_model.py --model_path "models/checkpoints/MobileNet+32+20+0.0001+0.2+320+320.keras"
+```
 
 ## 📸 Captura y Visualización de Imágenes
 
