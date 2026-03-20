@@ -25,11 +25,19 @@ def parse_args():
     parser.add_argument('--width', type=int, default=96, help="Image width")
     parser.add_argument('--height', type=int, default=96, help="Image height")
     parser.add_argument('--learning_rate', type=float, default=0.0001, help="Learning rate")
-    parser.add_argument('--model_path', type=str, default=f"models/checkpoints/MobileNet+32+20+{learning_rate}+0.2+{width}+{height}.keras", help="Ruta al modelo entrenado")
-    parser.add_argument('--data_dir', type=str, default=f"data/processed/{width}x{height}", help="Ruta al directorio con imágenes de prueba (debe contener subcarpetas por clase)")
+    parser.add_argument('--model_path', type=str, default=None, help="Ruta al modelo entrenado")
+    parser.add_argument('--data_dir', type=str, default=None, help="Ruta al directorio con imágenes de prueba (debe contener subcarpetas por clase)")
     parser.add_argument('--class_names_path', type=str, default="models/class_names.txt", help="Ruta al archivo txt con los nombres de las clases")
     
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    if args.model_path is None:
+        args.model_path = f"models/checkpoints/MobileNet+32+20+{args.learning_rate}+0.2+{args.width}+{args.height}.keras"
+        
+    if args.data_dir is None:
+        args.data_dir = f"data/processed/{args.width}x{args.height}"
+        
+    return args
 
 def main():
     args = parse_args()

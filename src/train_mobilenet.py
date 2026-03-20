@@ -180,7 +180,7 @@ def plot_history(history, plot_path):
 
 def main(img_width, img_height, batch_size, epochs, learning_rate, validation_split, base_model_name):
     data_dir = f"data/processed/{img_width}x{img_height}"
-    img_shape = (img_width, img_height, 1)
+    img_shape = (img_height, img_width, 1)
     plot_path = f"tensorboard_logs/{base_model_name}_training_history+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{img_width}+{img_height}.png"
     checkpoint_path = f"models/checkpoints/{base_model_name}+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{img_width}+{img_height}.keras"
 
