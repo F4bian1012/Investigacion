@@ -1,8 +1,4 @@
-tensorflow
-tensorflow-model-optimization
-numpy
-pandas
-matplotlib
-jupyter
 opencv-python
-pyserial
+tensorflow
+numpy
+matplotlib

@@ -37,11 +37,42 @@ Separamos los datos en tres estados inmutables para evitar corrupción y fugas d
 
 Scripts orquestadores para el ciclo de vida completo del modelo:
 
-### 1. Entrenamiento (`src/train_model.py`)
+### 1. Entrenamiento Modelo Base (`src/train_model.py`)
 Entrena el modelo base (CNN) con datos de Fashion MNIST normalizados.
 - **Entrada:** Dataset Fashion MNIST (descarga automática).
 - **Salida:** `models/checkpoints/best_model.keras`.
 - **Uso:** `python src/train_model.py`
+
+### 1.1 Entrenamiento MobileNet - Datos Personalizados (`src/train_mobilenet.py`)
+Entrena un modelo de la familia MobileNet con Transfer Learning sobre los datos procesados, ideal para inferencia en el Portenta H7.
+
+**Entradas Automáticas:**
+- **Entrada:** Las imágenes se cargan automáticamente desde `data/processed/{width}x{height}/` según la resolución indicada.
+
+**Salidas (Checkpoints y Logs Dinámicos):** 
+Se guardan de forma dinámica incorporando los parámetros en el nombre del archivo para facilitar el tracking y versionado de experimentos:
+- **Modelo:** `models/checkpoints/{base_model}+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{width}+{height}.keras`
+- **Gráfica:** `tensorboard_logs/{base_model}_training_history+{batch_size}+{epochs}+{learning_rate}+{validation_split}+{width}+{height}.png`
+
+**Hiperparámetros (Soportados por CLI):**
+- `--base_model` (Opciones: `MobileNet`, `MobileNetV2`, `MobileNetV3Large`, `MobileNetV3Small` | Por defecto: `MobileNetV2`)
+- `--width` y `--height` (Por defecto: 96)
+- `--batch_size` (Por defecto: 32)
+- `--epochs` (Por defecto: 20)
+- `--learning_rate` (Por defecto: 0.0001)
+- `--validation_split` (Por defecto: 0.2)
+
+**Uso:**
+```bash
+# Entrenamiento con valores por defecto (MobileNetV2)
+python src/train_mobilenet.py
+
+# Uso con el modelo base original (MobileNet v1)
+python src/train_mobilenet.py --base_model "MobileNet"
+
+# Personalizando los hiperparámetros
+python src/train_mobilenet.py --base_model "MobileNetV3Large" --width 96 --height 96 --batch_size 16 --epochs 30 --learning_rate 0.00005 --validation_split 0.25
+```
 
 ### 2. Optimización (`src/optimize_model.py`)
 Pipeline completo que aplica **Pruning** (poda) y **Cuantización Post-Entrenamiento** (PTQ) para generar modelos eficientes.
@@ -104,4 +135,30 @@ python src/visualize_serial_image.py
 python src/visualize_serial_image.py --port /dev/tty.usbmodem1301 
 # En windows
 python src/visualize_serial_image.py --port COM7
+```
+
+### 3. Procesamiento de Imágenes (`src/process_images.py`)
+Convierte imágenes a escala de grises controlando la compresión para evitar que aumente el tamaño del archivo, preparándolas para el entrenamiento.
+
+**Uso básico (rutas por defecto):**
+```bash
+python src/process_images.py
+```
+
+**Uso con rutas personalizadas:**
+```bash
+python src/process_images.py --raw_path "ruta/a/imagenes_crudas" --path_processed "ruta/a/destino"
+```
+
+### 4. Redimensionamiento de Imágenes (`src/reshape_images.py`)
+Redimensiona las imágenes procesadas al tamaño objetivo para TinyML, conservando la estructura de carpetas (clases).
+
+**Uso básico (rutas por defecto, busca recursivamente en `data/processed/grayscale`):**
+```bash
+python src/reshape_images.py --width 96 --height 96
+```
+
+**Uso con directorio de entrada personalizado:**
+```bash
+python src/reshape_images.py --input_dir "ruta/personalizada" --width 96 --height 96
 ```
