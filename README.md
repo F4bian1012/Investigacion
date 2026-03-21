@@ -100,6 +100,42 @@ python src/test_model.py --width 160 --height 160 --learning_rate 0.0005
 python src/test_model.py --model_path "models/checkpoints/MobileNet+32+20+0.0001+0.2+320+320.keras"
 ```
 
+### 3. Cuantización a INT8 (`src/quantize_int8_basic.py`)
+Convierte un modelo entrenado en formato `.keras` a un modelo optimizado `.tflite` utilizando Full Integer Quantization (INT8). Este proceso es indispensable para poder ejecutar el modelo de manera eficiente en hardware con recursos limitados (como Arduino Portenta H7).
+
+- **Entrada Automática:** Busca automáticamente el primer modelo disponible en `models/checkpoints/` si no se especifica.
+- **Calibración:** Utiliza un dataset representativo extraído de `data/processed/` para calibrar las activaciones.
+- **Salida:** Un modelo TFLite completamente cuantizado en `models/tflite/`.
+
+**Hiperparámetros (Soportados por CLI):**
+- `--model_path` (Opcional, ruta específica del modelo `.keras` a cuantizar)
+
+**Uso:**
+```bash
+# Búsqueda y proceso automático
+python src/quantize_int8_basic.py
+
+# Especificando la ruta exacta al modelo
+python src/quantize_int8_basic.py --model_path "models/checkpoints/MobileNet+32+20+0.0001+0.2+96+96.keras"
+```
+
+### 4. Evaluación de Modelos Cuantizados TFLite (`src/test_tflite_model.py`)
+Recrea la lógica de evaluación (matriz de confusión y reporte de métricas) orientada exclusivamente a los modelos `.tflite` exportados con validación INT8. Identifica los tensores, los cuantiza automáticamente previo a la inferencia de TFLite y descuantiza los resultados antes de evaluarlos.
+
+- **Entrada:** Modelo INT8 ubicado en `models/tflite/` y el dataset original de procesamiento en escala de grises.
+- **Salida:** Métricas extensas por la terminal y creación de la matriz de confusión estéticamente amigable junto al modelo evaluado.
+
+**Hiperparámetros (Soportados por CLI):**
+- `--width` y `--height` (Por defecto: 96, define resolución final exigida por el modelo y para carga de imágenes)
+- `--model_path` (Opcional, ruta al modelo TFLite a cargar)
+- `--data_dir` y `--class_names_path` (Opcionales, rutas personalizadas a características de los datos)
+
+**Uso:**
+```bash
+# Inferencia estándar indicando la ruta del modelo .tflite y resolución del sensor
+python src/test_tflite_model.py --model_path "models/tflite/Modelo_int8.tflite" --width 96 --height 96
+```
+
 ## 📸 Captura y Visualización de Imágenes
 
 Herramientas para capturar y visualizar datos desde la cámara de la Portenta H7.
