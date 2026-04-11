@@ -7,6 +7,8 @@
 #else
 #define HAVE_ATTRIBUTE(x) 0
 #endif
+
+// Modificamos el macro para que incluya TANTO la alineación COMO la memoria QSPI
 #if HAVE_ATTRIBUTE(aligned) || (defined(__GNUC__) && !defined(__clang__))
 #define DATA_ALIGN_ATTRIBUTE __attribute__((aligned(16)))
 #else
@@ -22,7 +24,9 @@ extern const unsigned char g_model[];
 
 const unsigned int g_model_len = 645120;
 
+// Ahora sí, esta línea le dice al compilador que lo alinee y lo mande a la QSPI
 const unsigned char g_model[] DATA_ALIGN_ATTRIBUTE = {
+  // ... (aquí siguen todos tus números hexadecimales)
   0x20, 0x00, 0x00, 0x00, 0x54, 0x46, 0x4c, 0x33, 0x00, 0x00, 0x00, 0x00,
   0x14, 0x00, 0x20, 0x00, 0x1c, 0x00, 0x18, 0x00, 0x14, 0x00, 0x10, 0x00,
   0x0c, 0x00, 0x00, 0x00, 0x08, 0x00, 0x04, 0x00, 0x14, 0x00, 0x00, 0x00,
